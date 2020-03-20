@@ -7,6 +7,7 @@ from flask_cors import CORS
 from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
 
+
 app = Flask(__name__)
 setup_db(app)
 CORS(app)
@@ -19,6 +20,17 @@ CORS(app)
 #db_drop_and_create_all()
 
 ## ROUTES
+
+@app.route('/drinks', methods=['GET'])
+@requires_auth('get:images')
+def get_drinks(payload):
+    selection = Drink.query.all()
+    drinks = selection.long()
+
+    return jsonify({
+        'success': True,
+        'drinks': [drink.title for drink in drinks],
+    })
 
 '''
 @TODO implement endpoint
