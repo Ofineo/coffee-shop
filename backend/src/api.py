@@ -21,17 +21,6 @@ CORS(app)
 
 ## ROUTES
 
-@app.route('/drinks', methods=['GET'])
-@requires_auth('get:images')
-def get_drinks(payload):
-    selection = Drink.query.all()
-    drinks = selection.long()
-
-    return jsonify({
-        'success': True,
-        'drinks': [drink.title for drink in drinks],
-    })
-
 '''
 @TODO implement endpoint
     GET /drinks
@@ -40,7 +29,16 @@ def get_drinks(payload):
     returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=['GET'])
+@requires_auth('get:images')
+def get_drinks(payload):
+    selection = Drink.query.all()
+    drinks = selection.short()
 
+    return jsonify({
+        'success': True,
+        'drinks': drinks # [drink.title for drink in drinks],
+    })
 
 '''
 @TODO implement endpoint
@@ -63,6 +61,7 @@ def get_drinks(payload):
 '''
 
 
+
 '''
 @TODO implement endpoint
     PATCH /drinks/<id>
@@ -74,7 +73,6 @@ def get_drinks(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
-
 
 '''
 @TODO implement endpoint
