@@ -120,7 +120,7 @@ def patch_drinks(payload, id):
         "success": True, 
         "drinks": [drink.long()]
     })
-    
+
 '''
 @TODO implement endpoint
     DELETE /drinks/<id>
@@ -131,7 +131,23 @@ def patch_drinks(payload, id):
     returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<id>', methods=['DELETE'])
+@requires_auth('delete:drinks')
+def delete_drinks(payload, id):
+    selection = Drink.query.get(id).one_or_none()
 
+    if not selection:
+        abort(404)
+        id = 404
+    try:
+        selection.delete()
+    except:
+        abort(500)
+
+    return jsonify({
+        "success": True, 
+        "delete": id
+    })
 
 ## Error Handling
 '''
