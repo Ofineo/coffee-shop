@@ -68,7 +68,21 @@ def get_drinks_details(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def post_drinks(payload):
+    res = request.get_json()
+    drink = Drink(
+        name= res.get('name', None), 
+        color= res.get('color', None),
+        parts= res.get('parts', None)
+    )
+    drink.insert()
 
+    return jsonify({
+        "success": True, 
+        "drinks": [res.data('name'), res.data('color'), res.data('parts')]
+    })
 
 
 '''
