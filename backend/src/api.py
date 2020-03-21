@@ -96,7 +96,31 @@ def post_drinks(payload):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+@app.route('/drinks/<id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def patch_drinks(payload, id):
+    selection = Drink.query.get(id).one_or_none()
+    res = request.get_json()
 
+    if not selection:
+        abort(404)
+
+    try:
+        drink = Drink(
+            id = res.get('id', None),
+            title = res.get('title', None),
+            recipe = res.get('recipe', None ) 
+        )
+
+        drink.update()
+    except:
+        abort(500)
+
+    return jsonify({
+        "success": True, 
+        "drinks": [drink.long()]
+    })
+    
 '''
 @TODO implement endpoint
     DELETE /drinks/<id>
