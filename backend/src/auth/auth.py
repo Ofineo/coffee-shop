@@ -61,6 +61,7 @@ def get_token_auth_header():
         }, 401)
 
     token = parts[1]
+    
     return token
 
 '''
@@ -106,7 +107,7 @@ def verify_decode_jwt(token):
     jwks = json.loads(jsonurl.read())
     
     unverified_header = jwt.get_unverified_header(token)
-    print(unverified_header)
+    print('header :',unverified_header)
     rsa_key = {}
     if 'kid' not in unverified_header:
         raise AuthError({
