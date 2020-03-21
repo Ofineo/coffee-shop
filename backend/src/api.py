@@ -158,7 +158,7 @@ def unprocessable(error):
     return jsonify({
                     "success": False, 
                     "error": 422,
-                    "message": "unprocessable"
+                    "message": "unprocessable. The request was well-formed but was unable to be followed due to semantic errors."
                     }), 422
 
 '''
@@ -176,9 +176,22 @@ def unprocessable(error):
 @TODO implement error handler for 404
     error handler should conform to general task above 
 '''
-
+@app.errorhandler(404)
+def not_found(error):
+    return({
+        "success": False, 
+        "error": 404,
+        "message": "The server can not find the requested resource."
+    }),404
 
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+@app.errorhandler(401)
+def auth_error(error):
+    return({
+        "success": False, 
+        "error": 401,
+        "message": "You have no authorized. the client must authenticate itself to get the requested response"
+    }),401
