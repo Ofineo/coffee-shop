@@ -13,9 +13,9 @@ setup_db(app)
 CORS(app)
 
 
-#db_drop_and_create_all()
+# db_drop_and_create_all()
 
-## ROUTES
+# ROUTES
 
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
@@ -30,20 +30,22 @@ def get_drinks():
         'drinks': drinks
     })
 
+
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
 def get_drinks_details(payload):
     selection = Drink.query.all()
 
-    drinks=[]
+    drinks = []
 
     for drink in selection:
         drinks.append(drink.long())
 
     return jsonify({
-        "success": True, 
+        "success": True,
         "drinks": drinks
     })
+
 
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
@@ -53,18 +55,19 @@ def post_drinks(payload):
     drinks = []
 
     drink = Drink(
-        title= res.get('title'), 
-        recipe= json.dumps(res['recipe'])
+        title=res.get('title'),
+        recipe=json.dumps(res['recipe'])
 
     )
-    drink.insert() 
+    drink.insert()
 
     drinks.append(drink.long())
 
     return jsonify({
-        "success": True, 
+        "success": True,
         "drinks": drinks
     })
+
 
 @app.route('/drinks/<id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
@@ -79,20 +82,22 @@ def patch_drinks(payload, id):
 
     try:
         drink = Drink(
-            id = res.get('id', None),
-            title = res.get('title', None),
-            recipe = res.get('recipe', None ) 
+            id=res.get('id', None),
+            title=res.get('title', None),
+            recipe=res.get('recipe', None)
         )
 
         drink.update()
         drinks.append(drink.long())
-    except:
+    except Exception as e:
         abort(500)
+        print('Exception :', e)
 
     return jsonify({
-        "success": True, 
+        "success": True,
         "drinks": drinks
     })
+
 
 @app.route('/drinks/<id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
@@ -104,36 +109,40 @@ def delete_drinks(payload, id):
         id = 404
     try:
         selection.delete()
-    except:
+    except Exception as e:
         abort(500)
+        print('Exception :', e)
 
     return jsonify({
-        "success": True, 
+        "success": True,
         "delete": id
     })
 
-## Error Handling
+# Error Handling
+
 
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
-                    "success": False, 
+                    "success": False,
                     "error": 422,
-                    "message": "unprocessable. The request was well-formed but was unable to be followed due to semantic errors."
+                    "message": "unprocessable."
                     }), 422
+
 
 @app.errorhandler(404)
 def not_found(error):
     return({
-        "success": False, 
+        "success": False,
         "error": 404,
         "message": "The server can not find the requested resource."
-    }),404
+    }), 404
+
 
 @app.errorhandler(401)
 def auth_error(error):
     return({
-        "success": False, 
+        "success": False,
         "error": 401,
-        "message": "You have no authorized. the client must authenticate itself to get the requested response"
-    }),401
+        "message": "You have no authorized."
+    }), 401
