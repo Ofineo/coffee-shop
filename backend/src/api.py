@@ -52,10 +52,12 @@ def get_drinks_details(payload):
 def post_drinks(payload):
     res = request.get_json()
 
+    print(res)
+
     drinks = []
 
     drink = Drink(
-        title=res.get('title'),
+        title=res['title'],
         recipe=json.dumps(res['recipe'])
 
     )
@@ -72,30 +74,28 @@ def post_drinks(payload):
 @app.route('/drinks/<id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def patch_drinks(payload, id):
-    selection = Drink.query.get(id).one_or_none()
+
+    selection = Drink.query.get(id)
     res = request.get_json()
 
     if not selection:
         abort(404)
 
-    drinks = []
-
     try:
-        drink = Drink(
-            id=res.get('id', None),
-            title=res.get('title', None),
-            recipe=res.get('recipe', None)
-        )
+        selection.title = res['title']
 
-        drink.update()
-        drinks.append(drink.long())
+        if 'recipe' in res:
+            selection.recipe = json.dumps(res['recipe'])
+
+        selection.update()
+
     except Exception as e:
-        abort(500)
+        abort(401)
         print('Exception :', e)
 
     return jsonify({
         "success": True,
-        "drinks": drinks
+        "drinks": [selection.long()]
     })
 
 
@@ -132,17 +132,17 @@ def unprocessable(error):
 
 @app.errorhandler(404)
 def not_found(error):
-    return({
+    return jsonify({
         "success": False,
         "error": 404,
         "message": "The server can not find the requested resource."
     }), 404
 
 
-@app.errorhandler(401)
+@app.errorhandler(AuthError)
 def auth_error(error):
-    return({
+    return jsonify({
         "success": False,
         "error": 401,
-        "message": "You have no authorized."
+        "message": "You are no authorized."
     }), 401
